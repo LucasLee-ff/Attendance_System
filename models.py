@@ -1,6 +1,10 @@
 # 数据库模型
 from apps.ext import db
 from datetime import datetime
+from sqlalchemy import Column, Integer, ForeignKey, Table
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker,relationship,backref
+
 '''
 数据库初始化方法: 
 1.在命令行输入python3 app.py db migrate
@@ -40,7 +44,7 @@ class Student(db.Model):
     Stel = db.Column(db.Integer)
     Spwd = db.Column(db.String(30), nullable=False)
     Sschool = db.Column(db.String(40))
-    CurriculumList = db.relationship('Curriculum', backref='Student', cascade='all, delete-orphan', passive_deletes=True)
+    CurriculumList = db.relationship('Curriculum', secondary="student_curriculum", backref='Student')
     Attendancelist = db.relationship('Attendance', backref='Student', cascade='all, delete-orphan', passive_deletes=True)
 
     def __init__(self, Snum, Sname, Spwd, Stel, Sschool):
@@ -65,7 +69,7 @@ class Curriculum(db.Model):
     #Kdate = db.Column(db.Date, nullable=True)  # 密钥过期日期
     #outofdate = db.Column(db.Boolean, nullable=True)
     Tid = db.Column(db.Integer, db.ForeignKey('teacher.Tid'),nullable=False)
-    StudentList = db.relationship('Student', backref='Curriculum', cascade='all, delete-orphan', passive_deletes=True)
+    StudentList = db.relationship('Student', secondary="student_curriculum", backref='Curriculum')
     Attendancelist = db.relationship('Attendance', backref='Curriculum', cascade='all, delete-orphan', passive_deletes=True)
 
     def __init__(self, Cum, Cname, Cterm, Tid):
@@ -97,6 +101,14 @@ class Attendance(db.Model):
 
     def __repr__(self):
         return '<Record %r>' % self.Apid
+
+# 多对多
+class Student_Curriculum(db.Model):
+    __tablename__ = 'student_curriculum'
+    id = Column(Integer,primary_key=True)
+    student_id = Column(Integer, ForeignKey("student.Sid"))
+    curriculum_id = Column(Integer, ForeignKey("curriculum.Cid"))
+
 
 # 系统数据
 class System(db.Model):

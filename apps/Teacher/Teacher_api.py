@@ -6,7 +6,7 @@ teacher_bp = Blueprint('Teacher', __name__)
 teacher_api = Api(teacher_bp)
 
 # 需要进行权限验证的路由
-required_login_list = ['/Teacher/get']
+required_login_list = ['/Teacher/get/', '/Teacher/alterinformation/']
 
 # 判断是否已经登录
 @teacher_bp.before_app_request
@@ -40,7 +40,7 @@ def teacher_register():
     Tname = request.form.get('Tname')
     Tnum = request.form.get('Tnum')
     Tschool = request.form.get('Tschool')
-    if len(Ttel)!=11 or (not Ttel.isdigit()):
+    if not Ttel.isdigit():
         return {'msg_code': 2}  # 手机号不正确
     teacher = Teacher.query.filter_by(Ttel=Ttel).first()
     if teacher:
@@ -53,8 +53,27 @@ def teacher_register():
     db.session.commit()  # 写入数据库中
     return {'msg_code': 1} # 注册成功
 
+# 教师修改信息
+@teacher_bp.route('/Teacher/alterinformation/',methods=['POST'])
+def teacher_alterinformation():
+    new_Ttel = request.form.get('new_Ttel')
+    new_Tpwd = request.form.get('new_Tpwd')
+    new_Tname = request.form.get('new_Tname')
+    new_Tnum = request.form.get('new_Tnum')
+    new_Tschool = request.form.get('new_Tschool')
+    teacher = Teacher.query.get(g.teacher.Tid)
+    if teacher:
+        teacher.Ttel = new_Ttel
+        teacher.Tpwd = new_Tpwd
+        teacher.Tname = new_Tname
+        teacher.Tnum = new_Tnum
+        teacher.Tschool = new_Tschool
+        db.session.commit()
+        return {'msg_code': 1}  # 修改成功
+    return {'mag_code': 2}  # 修改失败
 
-class Teacher(Resource):
+
+class Teacher_rest(Resource):
     # 查询某个教师
     def get(self):
         parser = reqparse.RequestParser()
@@ -76,4 +95,4 @@ class Teacher(Resource):
         else:
             return {'msg_code': 7}, 404  # 查询的教师不存在
 
-teacher_api.add_resource(Teacher, '/Teacher')
+teacher_api.add_resource(Teacher_rest, '/Teacher')
