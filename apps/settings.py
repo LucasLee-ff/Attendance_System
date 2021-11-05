@@ -2,7 +2,7 @@ import os
 
 class Config:
     ENV = 'development'
-    DEBUG = False
+    DEBUG = True
     Threaded = True
     # URI需要修改成本地的数据库地址  格式：'数据库名+驱动名://用户名:密码@主机IP:端口号/数据库表名'
     SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:123456@localhost:3306/app"
