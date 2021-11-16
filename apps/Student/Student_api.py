@@ -80,7 +80,7 @@ def student_alterinformation():
         student.Tschool = new_Sschool
         db.session.commit()
         return {'msg_code': 1}  # 修改成功
-    return {'mag_code': 2}  # 修改失败
+    return {'msg_code': 2}  # 修改失败
 
 
 # 学生选课相关
